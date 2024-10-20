@@ -18,7 +18,7 @@ app.get('/start-puppeteer', async (req, res) => {
 
         // Puppeteer launch with headless mode and necessary arguments
         const browser = await puppeteer.launch({
-            executablePath: puppeteer.executablePath(),  // Use Puppeteer's bundled Chromium
+            executablePath: 'C:\Users\ASUS\.cache\puppeteer\chrome\win64-130.0.6723.58\chrome-win64\chrome.exe',  // Use Puppeteer's bundled Chromium
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
