@@ -9,14 +9,18 @@ app.use(cors());  // Enable CORS for all requests
 // Add a route to accept Flipkart URL as a query parameter
 app.get('/start-puppeteer', async (req, res) => {
     try {
-        // console.log("FlipKart URL: " + req.query.url);
+        console.log("FlipKart URL: " + req.query.url);
         const flipkartUrl = req.query.url;  // Get the Flipkart URL from the query parameter
         
         if (!flipkartUrl) {
             return res.status(400).send('Flipkart URL is required.');
         }
 
-        const browser = await puppeteer.launch();
+        // Puppeteer launch with headless mode and necessary arguments
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
         const page = await browser.newPage();
 
         // Navigate to the Flipkart page using the dynamic URL
@@ -32,20 +36,20 @@ app.get('/start-puppeteer', async (req, res) => {
         });
 
         // Extract the price from Flipkart
-        const extractedPrice = await page.evaluate(() => {
-            const price = document.querySelector('.Nx9bqj.CxhGGd');
-            return price ? price.innerText : 'Element not found';
-        });
+        // const extractedPrice = await page.evaluate(() => {
+        //     const price = document.querySelector('.Nx9bqj.CxhGGd');
+        //     return price ? price.innerText : 'Element not found';
+        // });
 
         // console.log('Extracted Price from Flipkart:', extractedPrice);
-        // console.log('Extracted Text from Flipkart:', extractedText);
+        console.log('Extracted Text from Flipkart:', extractedText);
 
         // Navigate to Amazon and get search results based on the extracted text
         const amazonUrl = `https://www.amazon.in/s?k=${encodeURIComponent(extractedText)}`;
         await page.goto(amazonUrl);
 
         // Pass `extractedPrice` into the browser context and use it
-        const results = await page.evaluate((extractedPrice) => {
+        const results = await page.evaluate(() => {
             const items = [];
             const priceElements = document.querySelectorAll('.a-price-whole');
             const ratingElements = document.querySelectorAll('.a-icon-alt');
@@ -57,11 +61,11 @@ app.get('/start-puppeteer', async (req, res) => {
                 const link = linkElements[i]?.href || "No Link Available";
                 
                 // Push the extracted Flipkart price with Amazon results
-                items.push({ price, rating, link, extractedPrice });
+                items.push({ price, rating, link });
             }
 
             return items;
-        }, extractedPrice);  // Pass extractedPrice to the evaluate function
+        });  
 
         console.log("Amazon Results:", results);
         await browser.close();
@@ -74,6 +78,8 @@ app.get('/start-puppeteer', async (req, res) => {
     }
 });
 
-app.listen(5000, () => {
-    console.log('Server is running on http://localhost:5000');
+// Use the process.env.PORT for dynamic port assignment on Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
