@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 
@@ -18,9 +19,16 @@ app.get('/start-puppeteer', async (req, res) => {
 
         // Puppeteer launch with headless mode and necessary arguments
         const browser = await puppeteer.launch({
-            executablePath: 'C:/Users/ASUS/.cache/puppeteer/chrome/win64-130.0.6723.58/chrome-win64/chrome.exe',
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: [
+                "--disable-setuid-sandbox",
+                "--no-sandbox",
+                "--single-process",
+                "--no-zygote",
+            ],
+            executablePath:
+                process.env.NODE_ENV === "production"
+                    ? process.env.PUPPETEER_EXECUTABLE_PATH
+                    : puppeteer.executablePath(),
         });
         
         const page = await browser.newPage();
