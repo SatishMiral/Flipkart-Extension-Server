@@ -18,6 +18,7 @@ app.get('/start-puppeteer', async (req, res) => {
 
         // Puppeteer launch with headless mode and necessary arguments
         const browser = await puppeteer.launch({
+            executablePath: puppeteer.executablePath(),  // Use Puppeteer's bundled Chromium
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
@@ -36,12 +37,12 @@ app.get('/start-puppeteer', async (req, res) => {
         });
 
         // Extract the price from Flipkart
-        // const extractedPrice = await page.evaluate(() => {
-        //     const price = document.querySelector('.Nx9bqj.CxhGGd');
-        //     return price ? price.innerText : 'Element not found';
-        // });
+        const extractedPrice = await page.evaluate(() => {
+            const price = document.querySelector('.Nx9bqj.CxhGGd');
+            return price ? price.innerText : 'Element not found';
+        });
 
-        // console.log('Extracted Price from Flipkart:', extractedPrice);
+        console.log('Extracted Price from Flipkart:', extractedPrice);
         console.log('Extracted Text from Flipkart:', extractedText);
 
         // Navigate to Amazon and get search results based on the extracted text
@@ -49,7 +50,7 @@ app.get('/start-puppeteer', async (req, res) => {
         await page.goto(amazonUrl);
 
         // Pass `extractedPrice` into the browser context and use it
-        const results = await page.evaluate(() => {
+        const results = await page.evaluate((extractedPrice) => {
             const items = [];
             const priceElements = document.querySelectorAll('.a-price-whole');
             const ratingElements = document.querySelectorAll('.a-icon-alt');
@@ -61,11 +62,11 @@ app.get('/start-puppeteer', async (req, res) => {
                 const link = linkElements[i]?.href || "No Link Available";
                 
                 // Push the extracted Flipkart price with Amazon results
-                items.push({ price, rating, link });
+                items.push({ price, rating, link, extractedPrice });
             }
 
             return items;
-        });  
+        },extractedPrice);  
 
         console.log("Amazon Results:", results);
         await browser.close();

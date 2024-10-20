@@ -8,7 +8,12 @@
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["Flipkart", "Puppeteer", "Web Scraping", "Amazon"],
+  "keywords": [
+    "Flipkart",
+    "Puppeteer",
+    "Web Scraping",
+    "Amazon"
+  ],
   "author": "Satish Miral",
   "license": "ISC",
   "dependencies": {
