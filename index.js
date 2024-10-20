@@ -1,10 +1,10 @@
-import puppeteer from 'puppeteer';
-import express from 'express';
-import cors from 'cors';
+const puppeteer = require("puppeteer");
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
-app.use(cors());  // Enable CORS for all requests
+app.use(cors());  // Enable CORS for all requests4
 
 // Add a route to accept Flipkart URL as a query parameter
 app.get('/start-puppeteer', async (req, res) => {
