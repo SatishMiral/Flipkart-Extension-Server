@@ -1,11 +1,12 @@
-FROM ghcr.io/puppeteer/puppeteer:23.6.0 
+FROM node:20@sha256:fffa89e023a3351904c04284029105d9e2ac7020886d683775a298569591e5bb
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+    LANG=en_US.UTF-8
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+COPY puppeteer-browsers-latest.tgz puppeteer-latest.tgz puppeteer-core-latest.tgz ./
 RUN npm ci
 COPY . .
 CMD ["node", "index.js"]
