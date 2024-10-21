@@ -1,39 +1,38 @@
-FROM node:20@sha256:fffa89e023a3351904c04284029105d9e2ac7020886d683775a298569591e5bb
+# Base image
+FROM node:16-slim
 
-# Install necessary dependencies for Puppeteer
+# Install necessary dependencies for Chromium
 RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libx11-xcb1 \
     ca-certificates \
     fonts-liberation \
     libappindicator3-1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libxcomposite1 \
-    libxdamage1 \
     libxrandr2 \
-    libgbm-dev \
-    libnss3 \
-    lsb-release \
     xdg-utils \
-    wget \
-    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
-# Environment variables to skip downloading Chromium
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome \
-    LANG=en_US.UTF-8
+# Install Chromium browser
+RUN apt-get update && apt-get install -y chromium
 
+# Set up the working directory
 WORKDIR /usr/src/app
 
-# Copy package files and install dependencies
+# Install the application dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
-# Copy all source files
+# Copy the rest of the application code
 COPY . .
 
-# Command to run the app
-CMD ["node", "index.js"]
+# Expose the port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]
