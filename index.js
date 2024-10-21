@@ -28,10 +28,10 @@ app.get('/start-puppeteer', async (req, res) => {
         const page = await browser.newPage();
 
         // Navigate to the Flipkart page using the dynamic URL
-        await page.goto(flipkartUrl, { timeout: 30000 });  // 30 seconds timeout
+        await page.goto(flipkartUrl);
 
         // Wait for the element with the class _6EBuvT to be present
-        await page.waitForSelector('._6EBuvT', { timeout: 30000 });  // Timeout after 30 seconds
+        await page.waitForSelector('._6EBuvT');  
 
         // Extract the product name or relevant text from Flipkart
         const extractedText = await page.evaluate(() => {
