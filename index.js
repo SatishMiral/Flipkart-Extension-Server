@@ -1,14 +1,34 @@
-const puppeteer = require("puppeteer");
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
+
+let chrome = {};
+let puppeteer;
+
+if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+  chrome = require("chrome-aws-lambda");
+  puppeteer = require("puppeteer-core");
+} else {
+  puppeteer = require("puppeteer");
+}
 
 const app = express();
 app.use(cors());  // Enable CORS for all requests
 
 // Add a route to accept Flipkart URL as a query parameter
 app.get('/start-puppeteer', async (req, res) => {
+    let options = {};
+
+    if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+        options = {
+         args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
+         defaultViewport: chrome.defaultViewport,
+         executablePath: await chrome.executablePath,
+         headless: true,
+         ignoreHTTPSErrors: true,
+        };
+    }
     try {
+        let browser = await puppeteer.launch(options);
         console.log("FlipKart URL: " + req.query.url);
         const flipkartUrl = req.query.url;  // Get the Flipkart URL from the query parameter
         
@@ -16,15 +36,6 @@ app.get('/start-puppeteer', async (req, res) => {
             return res.status(400).send('Flipkart URL is required.');
         }
 
-        // Puppeteer launch with headless mode and necessary arguments
-        const browser = await puppeteer.launch({
-            args: [
-                "--disable-setuid-sandbox",
-                "--no-sandbox",
-            ],
-            headless: true,
-        });
-        
         const page = await browser.newPage();
 
         // Navigate to the Flipkart page using the dynamic URL
@@ -87,3 +98,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;
