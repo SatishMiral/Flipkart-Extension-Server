@@ -15,8 +15,6 @@ const app = express();
 app.use(cors());  // Enable CORS for all requests
 
 app.get('/', async(req,res) =>{
-    console.log("Server Started");
-    res.send(201);
     let options = {};
 
     if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
