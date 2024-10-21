@@ -23,7 +23,6 @@ app.get('/start-puppeteer', async (req, res) => {
                 "--no-sandbox",
             ],
             headless: true,
-            // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // Ensure correct Chromium path in Docker
         });
         
         const page = await browser.newPage();
