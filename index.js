@@ -16,7 +16,7 @@ app.use(cors());  // Enable CORS for all requests
 
 app.get('/', async(req,res) =>{
     console.log("Server Started");
-    res.send(200);
+    res.send(201);
 })
 
 // Add a route to accept Flipkart URL as a query parameter
