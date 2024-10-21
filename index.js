@@ -4,8 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-
-app.use(cors());  // Enable CORS for all requests4
+app.use(cors());  // Enable CORS for all requests
 
 // Add a route to accept Flipkart URL as a query parameter
 app.get('/start-puppeteer', async (req, res) => {
@@ -24,15 +23,16 @@ app.get('/start-puppeteer', async (req, res) => {
                 "--no-sandbox",
             ],
             headless: true,
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // Ensure correct Chromium path in Docker
         });
         
         const page = await browser.newPage();
 
         // Navigate to the Flipkart page using the dynamic URL
-        await page.goto(flipkartUrl);
+        await page.goto(flipkartUrl, { timeout: 30000 });  // 30 seconds timeout
 
         // Wait for the element with the class _6EBuvT to be present
-        await page.waitForSelector('._6EBuvT');
+        await page.waitForSelector('._6EBuvT', { timeout: 30000 });  // Timeout after 30 seconds
 
         // Extract the product name or relevant text from Flipkart
         const extractedText = await page.evaluate(() => {
@@ -51,7 +51,7 @@ app.get('/start-puppeteer', async (req, res) => {
 
         // Navigate to Amazon and get search results based on the extracted text
         const amazonUrl = `https://www.amazon.in/s?k=${encodeURIComponent(extractedText)}`;
-        await page.goto(amazonUrl);
+        await page.goto(amazonUrl, { timeout: 30000 });
 
         // Pass `extractedPrice` into the browser context and use it
         const results = await page.evaluate((extractedPrice) => {
@@ -70,7 +70,7 @@ app.get('/start-puppeteer', async (req, res) => {
             }
 
             return items;
-        },extractedPrice);  
+        }, extractedPrice);
 
         console.log("Amazon Results:", results);
         await browser.close();
