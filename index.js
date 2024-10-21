@@ -14,6 +14,11 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
 const app = express();
 app.use(cors());  // Enable CORS for all requests
 
+app.get('/', async(req,res) =>{
+    console.log("Server Started");
+    res.send(200);
+})
+
 // Add a route to accept Flipkart URL as a query parameter
 app.get('/start-puppeteer', async (req, res) => {
     let options = {};
